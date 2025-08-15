@@ -1,14 +1,14 @@
 -- Vortex Executor (FREE) v1.0
-local player = game.Players.LocalPlayer
 
--- Main GUI
+local player = game.Players.LocalPlayer
 local mainGui = Instance.new("ScreenGui")
 mainGui.Name = "VortexExecutor"
 mainGui.Parent = game:GetService("CoreGui")
 
+-- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 400, 0, 320)
-frame.Position = UDim2.new(0.5, -200, 0.5, -160)
+frame.Size = UDim2.new(0, 400, 0, 400)
+frame.Position = UDim2.new(0.5, -200, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(35,35,35)
 frame.BorderSizePixel = 0
 frame.Active = true
@@ -22,21 +22,23 @@ title.Position = UDim2.new(0,0,0,0)
 title.Text = "Vortex Executor (FREE) v1.0"
 title.BackgroundColor3 = Color3.fromRGB(25,25,25)
 title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 20
 title.Parent = frame
 
--- Close button
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 50, 0, 40)
-closeBtn.Position = UDim2.new(1,-50,0,0)
-closeBtn.Text = "X"
-closeBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
-closeBtn.TextColor3 = Color3.new(1,1,1)
-closeBtn.Parent = frame
-closeBtn.MouseButton1Click:Connect(function()
-    mainGui:Destroy()
-end)
+-- Username Box
+local userBox = Instance.new("TextBox")
+userBox.Size = UDim2.new(1, -20, 0, 30)
+userBox.Position = UDim2.new(0, 10, 0, 45)
+userBox.Text = "Enter username here"
+userBox.TextColor3 = Color3.new(1,1,1)
+userBox.BackgroundColor3 = Color3.fromRGB(50,50,50)
+userBox.ClearTextOnFocus = true
+userBox.Font = Enum.Font.SourceSans
+userBox.TextSize = 18
+userBox.Parent = frame
 
--- Button creation function
+-- Function to create buttons
 local function createButton(name, yPos, callback)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, -20, 0, 40)
@@ -44,39 +46,86 @@ local function createButton(name, yPos, callback)
     btn.Text = name
     btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
     btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 18
     btn.Parent = frame
     btn.MouseButton1Click:Connect(callback)
 end
 
 -- Infinite Yield
-createButton("Infinite Yield", 60, function()
+createButton("Infinite Yield", 90, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 end)
 
 -- Dex Explorer
-createButton("Dex Explorer", 110, function()
+createButton("Dex Explorer", 140, function()
     loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Dex%20Explorer.lua"))()
 end)
 
--- Fly (WeAreDevs)
-createButton("Fly", 160, function()
+-- Fly (WeAreDevs version)
+createButton("Fly", 190, function()
     loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Fly.lua"))()
 end)
 
--- Kick Player
-createButton("Kick Player", 210, function()
-    local username = player.Name -- default target, can replace with prompt if needed
-    local target = game:GetService("Players"):FindFirstChild(username)
+-- Kick
+createButton("Kick Player", 240, function()
+    local target = game:GetService("Players"):FindFirstChild(userBox.Text)
     if target then
-        target:Kick("Kicked via Vortex Executor")
+        target:Kick("Kicked via Vortex Executor (FREE)")
+    else
+        warn("Player not found: " .. userBox.Text)
     end
 end)
 
--- Ban Player
-createButton("Ban Player", 260, function()
-    local username = player.Name
-    local target = game:GetService("Players"):FindFirstChild(username)
+-- Ban
+createButton("Ban Player", 290, function()
+    local target = game:GetService("Players"):FindFirstChild(userBox.Text)
     if target then
-        target:Kick("Banned via Vortex Executor")
+        target:Kick("Banned via Vortex Executor (FREE)")
+        -- In premium: save banlist
+    else
+        warn("Player not found: " .. userBox.Text)
+    end
+end)
+
+-- Close Button
+createButton("Close Executor", 340, function()
+    mainGui:Destroy()
+end)
+
+-- === Resizer Handle ===
+local resizer = Instance.new("Frame")
+resizer.Size = UDim2.new(0,20,0,20)
+resizer.Position = UDim2.new(1,-20,1,-20)
+resizer.BackgroundColor3 = Color3.fromRGB(60,60,60)
+resizer.BorderSizePixel = 0
+resizer.Parent = frame
+resizer.Active = true
+resizer.Draggable = true
+
+-- Resize logic
+local UIS = game:GetService("UserInputService")
+local resizing = false
+
+resizer.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        resizing = true
+    end
+end)
+
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        resizing = false
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local mousePos = UIS:GetMouseLocation()
+        local absPos = frame.AbsolutePosition
+        local newWidth = math.max(300, mousePos.X - absPos.X)
+        local newHeight = math.max(300, mousePos.Y - absPos.Y)
+        frame.Size = UDim2.new(0, newWidth, 0, newHeight)
+        resizer.Position = UDim2.new(1,-20,1,-20)
     end
 end)
